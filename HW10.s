@@ -12,17 +12,19 @@
 
 multiplication:
 	li $t1, 0
-	li $t2, 16
+	li $t2, 32
+	li $s2, 0
 loop:
 	andi $t0, $s1, 1	# store the  least significant bit of the product in t0
 	beq $t0, $0, shift	# if the least significant bit is equal to 0 jump to shift
-	srl $t0, $s1, 16	# store the upper half of the product in t0
-	add $t0, $t0, $s0	# add multiplicand to the left half of the product
-	sll $t0, $t0, 16
-	and $s1, $s1, 0x0000ffff
-	or $s1, $s1, $t0	# place the result in the left half of Product register
+	add $s2, $s2, $s0	# add multiplicand to the left half of the product and place the result in the left half of Product register
 shift:
+	andi $t0, $s2, 1
 	srl $s1, $s1, 1		# shift the product right 1 bit
+	beq $t0, $0, next	# if t0 = 0 jump to next
+	ori $s1, $s1, 0x80000000
+next:
+	srl $s2, $s2, 1
 	add $t1, $t1, 1		# t1 = t1 + 1
 	slt $t3, $t1, $t2	# t1 < 32
 	bne $t3, $0, loop
